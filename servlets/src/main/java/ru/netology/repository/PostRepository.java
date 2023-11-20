@@ -7,7 +7,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 // Stub
-@Repository
+
 public class PostRepository {
     private final Map<Long, String> memory = new HashMap<>();
 
