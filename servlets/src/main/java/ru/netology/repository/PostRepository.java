@@ -9,13 +9,14 @@ import java.util.stream.Collectors;
 // Stub
 @Repository
 public class PostRepository {
-    private final Map<Long, String> memory = new HashMap<>();
+    private final Map<Long, Post> memory = new HashMap<>();
 
     public List<Post> all() {
 
         synchronized (memory) {
             return memory.entrySet().stream()
-                    .map(a -> new Post(a.getKey(), a.getValue()))
+                    .filter(a -> a.getValue().isDeleted() == false)
+                    .map(a->a.getValue())
                     .collect(Collectors.toList());
         }
 
@@ -25,27 +26,40 @@ public class PostRepository {
 
         synchronized (memory) {
             if (memory.containsKey(id)) {
-                return Optional.of(new Post(id, memory.get(id)));
+                if (!memory.get(id).isDeleted()) {
+                    return Optional.of(memory.get(id));
+                } else {
+                    return Optional.empty();
+                }
             } else {
                 return Optional.empty();
             }
         }
-
     }
 
-    public Post save(Post post) throws NumberFormatException {
+    public Optional<Post> save(Post post) throws NumberFormatException {
 
         synchronized (memory) {
-            memory.put(post.getId(), post.getContent());
+            if (memory.containsKey(post.getId())) {
+                if (!memory.get(post.getId()).isDeleted()) {
+                    memory.put(post.getId(), post);
+                    return Optional.of(post);
+                } else {
+                    return Optional.empty();
+                }
+            } else {
+                memory.put(post.getId(), post);
+                return Optional.of(post);
+            }
         }
-        return post;
+
     }
 
     public boolean removeById(long id) {
 
         synchronized (memory) {
             if (memory.containsKey(id)) {
-                memory.remove(id);
+                memory.get(id).setDeleted(true);
                 return true;
             } else {
                 return false;

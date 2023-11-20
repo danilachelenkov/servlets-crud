@@ -4,6 +4,8 @@ public class Post {
     private long id;
     private String content;
 
+    private boolean deleted = false;
+
     public Post() {
     }
 
@@ -14,6 +16,15 @@ public class Post {
 
     public long getId() {
         return id;
+    }
+
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
     }
 
     public void setId(long id) {
